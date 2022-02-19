@@ -32,4 +32,9 @@ class UserAdmin(BaseUserAdmin):
     )
 
 
+class CustomerAdmin(admin.ModelAdmin):
+    fields = ['user', 'phone_number']
+
+
 admin.site.register(models.User, UserAdmin)
+admin.site.register(models.Customer, CustomerAdmin)

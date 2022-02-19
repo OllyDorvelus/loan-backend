@@ -12,6 +12,7 @@ class AbstractModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True)
 
     class Meta:
         abstract = True
@@ -19,15 +20,12 @@ class AbstractModel(models.Model):
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, email, pen_name, password=None, **extra_fields):
+    def create_user(self, email, password=None, **extra_fields):
         """Creates and saves a new user"""
         if not email:
             raise ValueError('User must have an email address')
 
-        if not pen_name:
-            raise ValueError('Please choose a pen name')
-
-        user = self.model(email=self.normalize_email(email), pen_name=pen_name, **extra_fields)
+        user = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -57,6 +55,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
-class Customer(models.Model):
+class Customer(AbstractModel):
     user = models.OneToOneField('User', on_delete=models.PROTECT, related_name='customer')
     phone_number = PhoneNumberField()
+
+    def __str__(self):
+        return self.user.email
