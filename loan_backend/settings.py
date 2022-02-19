@@ -38,6 +38,7 @@ class Base(Configuration):
     MY_APPS = [
         'app.users',
         'app.accounts',
+        'app.api',
     ]
 
     THIRD_PARTY_APPS = [
