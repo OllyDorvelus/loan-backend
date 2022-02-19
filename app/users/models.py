@@ -70,7 +70,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Customer(AbstractModel):
     user = models.OneToOneField('User', on_delete=models.PROTECT, related_name='customer')
-    phone_number = PhoneNumberField()
+    phone_number = PhoneNumberField(unique=True)
 
     objects = CustomerManager()
 
