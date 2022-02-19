@@ -37,11 +37,14 @@ class Base(Configuration):
 
     MY_APPS = [
         'app.users',
+        'app.accounts',
     ]
 
     THIRD_PARTY_APPS = [
         'rest_framework',
         'django_extensions',
+        'phonenumber_field',
+        'djmoney',
     ]
 
     INSTALLED_APPS = DJANGO_APPS + MY_APPS + THIRD_PARTY_APPS
