@@ -32,6 +32,7 @@ class AccountManager(models.Manager):
 class AccountBase(AbstractModel):
     balance = MoneyField(max_digits=10, decimal_places=2, default_currency=ZAR)
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='accounts')
+    accepted_date = models.DateField(blank=True, null=True)
 
     class Meta:
         abstract = True
