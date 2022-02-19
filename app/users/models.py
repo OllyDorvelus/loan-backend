@@ -40,6 +40,19 @@ class UserManager(BaseUserManager):
         return user
 
 
+class CustomerManager(models.Manager):
+    def create_customer(self, user, phone_number, **extra_fields):
+        """Create and save a new customer"""
+        if not user:
+            raise ValueError("Customer must have a user")
+        if not phone_number:
+            raise ValueError("Customer must have phone number")
+
+        customer = self.model(user=user, phone_number=phone_number, **extra_fields)
+        customer.save(using=self._db)
+        return customer
+
+
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255, blank=True)
@@ -58,6 +71,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Customer(AbstractModel):
     user = models.OneToOneField('User', on_delete=models.PROTECT, related_name='customer')
     phone_number = PhoneNumberField()
+
+    objects = CustomerManager()
 
     def __str__(self):
         return self.user.email

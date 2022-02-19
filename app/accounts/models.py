@@ -13,7 +13,7 @@ LOAN_STATUS = (
 
 
 class AccountBase(AbstractModel):
-    balance = MoneyField(max_digits=10, decimal_places=2, default_currency='ZA')
+    balance = MoneyField(max_digits=10, decimal_places=2, default_currency='ZA', unique=True)
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='accounts')
 
     class Meta:

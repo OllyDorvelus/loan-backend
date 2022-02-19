@@ -34,6 +34,7 @@ class UserAdmin(BaseUserAdmin):
 
 class CustomerAdmin(admin.ModelAdmin):
     fields = ['user', 'phone_number']
+    list_display = fields
 
 
 admin.site.register(models.User, UserAdmin)
