@@ -8,6 +8,9 @@ class IsAdminOrObjectOwnerToRead(permissions.BasePermission):
      - nobody else can access
      """
 
+    def has_permission(self, request, view):
+        return request.user.is_superuser
+
     def has_object_permission(self, request, view, obj):
         # check if super user
         if request.user.is_superuser:
@@ -15,3 +18,4 @@ class IsAdminOrObjectOwnerToRead(permissions.BasePermission):
         # check if user is owner
         if request.method in permissions.SAFE_METHODS:
             return request.user == obj.user
+        return False
