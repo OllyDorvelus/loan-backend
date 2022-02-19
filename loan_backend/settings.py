@@ -26,7 +26,7 @@ class Base(Configuration):
 
     ALLOWED_HOSTS = []
 
-    INSTALLED_APPS = [
+    DJANGO_APPS = [
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
@@ -34,6 +34,17 @@ class Base(Configuration):
         'django.contrib.messages',
         'django.contrib.staticfiles',
     ]
+
+    MY_APPS = [
+        'app.users',
+    ]
+
+    THIRD_PARTY_APPS = [
+        'rest_framework',
+        'django_extensions',
+    ]
+
+    INSTALLED_APPS = DJANGO_APPS + MY_APPS + THIRD_PARTY_APPS
 
     MIDDLEWARE = [
         'django.middleware.security.SecurityMiddleware',
@@ -103,11 +114,18 @@ class Base(Configuration):
 
     DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+    # Custom settings
+    AUTH_USER_MODEL = 'users.User'
+
 
 class Dev(Base):
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': Base.BASE_DIR / 'db.sqlite3',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'HOST': 'jelani.db.elephantsql.com',
+            'NAME': os.getenv('LOAN_DB_NAME'),
+            'USER': os.getenv('LOAN_DB_NAME'),
+            'PASSWORD': os.getenv('LOAN_DB_PASSWORD'),
+            'PORT': '5432',
         }
     }
