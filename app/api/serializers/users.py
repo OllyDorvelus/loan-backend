@@ -5,14 +5,19 @@ from django.db import transaction
 
 
 class CustomerSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Customer
         fields = [
+            'id',
+            'active',
             'phone_number',
         ]
 
 
 class UserSerializer(serializers.ModelSerializer):
+    customer = CustomerSerializer(read_only=True)
+
     class Meta:
         model = User
         fields = [
