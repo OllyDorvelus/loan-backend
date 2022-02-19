@@ -66,7 +66,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         # ensure nothing gets created in case of failure.
         with transaction.atomic():
             user = User.objects.create_user(**validated_data)
-            Customer.objects.create_customerr(user=user, phone_number=phone_number)
+            Customer.objects.create_customer(user=user, phone_number=phone_number)
             return user
 
     def update(self, instance, validated_data):
