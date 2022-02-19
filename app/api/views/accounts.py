@@ -18,6 +18,6 @@ class AccountViewSet(viewsets.ModelViewSet):
         return serializer
 
     @action(detail=False, methods=['post'], name=APPLY_NAME, permission_classes=[IsAuthenticated])
-    def apply(self, request, pk=None, *args, **kwargs):
+    def apply(self, request, *args, **kwargs):
         """User can apply for a loan"""
         return super().create(request, *args, *kwargs)
