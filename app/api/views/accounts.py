@@ -19,10 +19,6 @@ class AccountViewSet(viewsets.ModelViewSet):
             return CreateLoanApplicationSerializer
         return serializer
 
-    # @action(detail=True, pk=None, methods=['PUT'], permission_classes=[IsAdminUser])
-    # def accept(self, request, *args, **kwargs):
-    #     pass
-
     @action(detail=False, methods=['post'], name=APPLY_NAME, permission_classes=[IsAuthenticated])
     def apply(self, request, *args, **kwargs):
         """User can apply for a loan"""

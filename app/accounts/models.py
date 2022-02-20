@@ -46,3 +46,9 @@ class LoanAccount(AccountBase):
 
     def __str__(self):
         return f'{self.user.email} - {self.balance} - {self.status}'
+
+    def accept(self):
+        self.active = True
+        self.save()
+        self.refresh_from_db()
+        return self

@@ -12,6 +12,7 @@ class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = LoanAccount
         fields = [
+            'id',
             'balance',
             'due_date',
             'status',
