@@ -19,3 +19,10 @@ class IsAdminOrObjectOwnerToRead(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return request.user == obj.user
         return False
+
+
+class AuthenticatedCantPost(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'POST' and request.user.is_authenticated  and not request.user.is_superuser:
+            return False
+        return True
