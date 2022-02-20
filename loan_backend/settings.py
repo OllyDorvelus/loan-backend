@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from configurations import Configuration
 from pathlib import Path
+from datetime import timedelta
 import os
 
 
@@ -43,9 +44,11 @@ class Base(Configuration):
 
     THIRD_PARTY_APPS = [
         'rest_framework',
+        'rest_framework.authtoken',
         'django_extensions',
         'phonenumber_field',
         'djmoney',
+        'dj_rest_auth',
     ]
 
     INSTALLED_APPS = DJANGO_APPS + MY_APPS + THIRD_PARTY_APPS
@@ -121,6 +124,16 @@ class Base(Configuration):
     # Custom settings
     AUTH_USER_MODEL = 'users.User'
 
+    REST_USE_JWT = True
+    JWT_AUTH_COOKIE = 'jwt'
+    JWT_AUTH_REFRESH_COOKIE = 'jwt-refresh'
+
+    REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        )
+    }
+
 
 class Dev(Base):
     DATABASES = {
@@ -132,4 +145,8 @@ class Dev(Base):
             'PASSWORD': os.getenv('LOAN_DB_PASSWORD'),
             'PORT': '5432',
         }
+    }
+
+    SIMPLE_JWT = {
+        'ACCESS_TOKEN_LIFETIME': timedelta(days=30)
     }
