@@ -76,3 +76,11 @@ class Customer(AbstractModel):
 
     def __str__(self):
         return self.user.email
+
+    @property
+    def number(self):
+        return str(self.phone_number)
+
+    @property
+    def whatsapp_number(self):
+        return f'whatsapp:{self.phone_number}'

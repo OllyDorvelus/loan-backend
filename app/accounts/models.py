@@ -2,6 +2,9 @@ from django.db import models
 from app.users.models import AbstractModel
 from djmoney.models.fields import MoneyField
 from moneyed import ZAR
+from django.db.models.signals import pre_save
+from app.api.whats_app_client import WhatsAppClient
+from datetime import date
 
 LOAN_STATUS = (
     ('ACTIVE', 'active'),
@@ -52,3 +55,19 @@ class LoanAccount(AccountBase):
         self.save()
         self.refresh_from_db()
         return self
+
+
+# signals
+
+def send_message_when_pending_to_active(sender, instance, **kwargs):
+    if instance.id:
+        old_instance = LoanAccount.objects.get(pk=instance.id)
+        instance.accepted_date = date.today()
+        if old_instance.status.lower() == 'pending' and instance.status.lower() == 'active':
+            WhatsAppClient.send_accept_notice(instance.user.customer.whatsapp_number, instance.user.first_name,
+                                              instance.user.last_name, instance.balance, instance.due_date,
+                                              instance.accepted_date)
+
+
+pre_save.connect(send_message_when_pending_to_active, sender=LoanAccount)
+
