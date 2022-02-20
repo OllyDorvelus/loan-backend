@@ -31,3 +31,8 @@ class WhatsAppClient:
     def send_payment_reminder(to_number, first_name, last_name, balance, due_date):
         msg = f'Hi {first_name} {last_name}, This is a reminder your payment of {balance} is due on the {due_date}'
         WhatsAppClient.send_message(msg, to_number)
+
+    @staticmethod
+    def send_paid_message(to_number, balance):
+        msg = f'Your balance of {balance} has been paid in full to Demifusion'
+        WhatsAppClient.send_message(msg, to_number)

@@ -67,7 +67,9 @@ def send_message_when_pending_to_active(sender, instance, **kwargs):
             WhatsAppClient.send_accept_notice(instance.user.customer.whatsapp_number, instance.user.first_name,
                                               instance.user.last_name, instance.balance, instance.due_date,
                                               instance.accepted_date)
+        if instance.balance <= 0:
+            instance.status = 'PAID'
+            WhatsAppClient.send_paid_message(instance.user.customer.whatsapp_number, old_instance.balance)
 
 
 pre_save.connect(send_message_when_pending_to_active, sender=LoanAccount)
-
