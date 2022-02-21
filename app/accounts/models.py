@@ -134,8 +134,8 @@ class Bank(AbstractModel):
     bank_type = models.ForeignKey('accounts.BankType', on_delete=models.CASCADE)
     account_number = models.CharField(max_length=20,
                                       validators=[RegexValidator('^[0-9]+$',
-                                                                message='Account must be numeric digits',
-                                                                code='invalid_account')]
+                                                                 message='Account must be numeric digits',
+                                                                 code='invalid_account')]
                                       )
 
     def __str__(self):
