@@ -44,7 +44,6 @@ class AccountBase(AbstractModel):
 class LoanAccount(AccountBase):
     due_date = models.DateField()
     status = models.CharField(max_length=14, choices=LOAN_STATUS, default='PENDING')
-
     objects = AccountManager()
 
     def __str__(self):
@@ -57,8 +56,12 @@ class LoanAccount(AccountBase):
         return self
 
 
-# signals
+class Transaction(AbstractModel):
+    amount = MoneyField(max_digits=10, decimal_places=2, default_currency=ZAR)
+    account = models.ForeignKey('accounts.LoanAccount', on_delete=models.CASCADE, related_name='transactions')
 
+
+# signals
 def send_message_when_pending_to_active(sender, instance, **kwargs):
     if instance.id:
         old_instance = LoanAccount.objects.get(pk=instance.id)
