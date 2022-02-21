@@ -67,6 +67,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
+
 
 class Customer(AbstractModel):
     user = models.OneToOneField('User', on_delete=models.PROTECT, related_name='customer')
@@ -86,7 +90,3 @@ class Customer(AbstractModel):
     @property
     def whatsapp_number(self):
         return f'whatsapp:{self.phone_number}'
-
-    @property
-    def full_name(self):
-        return f'{self.user.first_name} {self.user.last_name}'
