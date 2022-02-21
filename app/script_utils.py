@@ -31,7 +31,7 @@ def send_balance_past_due_notification():
     for account in accounts:
         WhatsAppClient.send_past_due_message(account.user.customer.whatsapp_number, account.user.full_name,
                                              account.total, account.due_date)
-        if (today - account.due_date).days >= 5:
+        if (today - account.due_date).days >= 2:
             account.status = 'PAST_DUE'
             account.save()
             print(f'Sent notification to Customer: {account.user.full_name}')
