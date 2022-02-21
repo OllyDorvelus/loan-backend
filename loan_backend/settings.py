@@ -151,7 +151,7 @@ class Dev(Base):
     STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
     AWS_S3_ACCESS_KEY_ID = os.getenv('DIMO_AWS_ACCESS_KEY')
     AWS_S3_SECRET_ACCESS_KEY = os.getenv('DIMO_AWS_SECRET_KEY')
-    AWS_STORAGE_BUCKET_NAME = os.getenv('DIMO_BUCKET_NAME')
+    AWS_STORAGE_BUCKET_NAME = os.getenv('DIMO_AWS_BUCKET_NAME')
 
     SIMPLE_JWT = {
         'ACCESS_TOKEN_LIFETIME': timedelta(days=30)
