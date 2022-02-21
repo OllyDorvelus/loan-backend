@@ -1,4 +1,5 @@
 import os
+from datetime import date
 from twilio.rest import Client
 
 account_sid = os.getenv('WA_ACCOUNT_SID')
@@ -18,21 +19,35 @@ class WhatsAppClient:
         )
 
     @staticmethod
-    def send_welcome_message(to_number):
-        msg = f'Your account was created for Demifusion, thank you for banking with us.'
+    def send_welcome_message(to_number, first_name, last_name, amount):
+        msg = f'Hi {first_name} {last_name} on {date.today()} for R{amount}, your loan application has been submitted to ' \
+              f'Dimofusion and we will notify you on the status of your applicaiton.'
+        WhatsAppClient.send_message(msg, to_number)
+
+    @staticmethod
+    def send_accept_loan_message(to_number, first_name, last_name, balance, due_date, total):
+        msg = f'Hi {first_name} {last_name} you have taken out a loan of R{balance}' \
+              f'with Dimofusion at a 25% interest rate. The total debt payable on  {due_date} is R{total}'
+        WhatsAppClient.send_message(msg, to_number)
+
+    @staticmethod
+    def send_payment_reminder(to_number, first_name, last_name, amount, due_date):
+        msg = f'Hi {first_name} {last_name}, This is a reminder your payment of R{amount} is due on the {due_date}'
         WhatsAppClient.send_message(msg, to_number)
 
     @staticmethod
     def send_accept_notice(to_number, first_name, last_name, balance, due_date, accepted_date):
-        msg = f'Hi {first_name} {last_name}, Your balance of {balance} was accepted on {accepted_date} and is due on {due_date}'
+        msg = f'Hi {first_name} {last_name}, Your loan of R{balance} was accepted on {accepted_date}' \
+              f' by Dimofusion and is due on {due_date}'
         WhatsAppClient.send_message(msg, to_number)
 
     @staticmethod
-    def send_payment_reminder(to_number, first_name, last_name, balance, due_date):
-        msg = f'Hi {first_name} {last_name}, This is a reminder your payment of {balance} is due on the {due_date}'
+    def send_paid_message(to_number, amount):
+        msg = f'Your balance of R{amount} has been paid in full to Dimofusion'
         WhatsAppClient.send_message(msg, to_number)
 
     @staticmethod
-    def send_paid_message(to_number, balance):
-        msg = f'Your balance of {balance} has been paid in full to Demifusion'
+    def send_close_message(to_number, first_name, last_name):
+        msg = f'Hi {first_name} {last_name}, your account at Dimofusion has been closed'
         WhatsAppClient.send_message(msg, to_number)
+

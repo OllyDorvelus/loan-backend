@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from app.api.serializers.accounts import CreateLoanApplicationSerializer, AccountSerializer
 from app.accounts.models import LoanAccount
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from app.api.permissions import IsAdminOrObjectOwnerToRead
 
 APPLY_NAME = 'Apply Loan'

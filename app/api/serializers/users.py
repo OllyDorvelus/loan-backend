@@ -14,6 +14,10 @@ class CustomerSerializer(serializers.ModelSerializer):
             'phone_number',
         ]
 
+        read_only_fields = [
+            'active',
+        ]
+
 
 class UserSerializer(serializers.ModelSerializer):
     customer = CustomerSerializer(read_only=True)
@@ -21,6 +25,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            'first_name',
+            'last_name',
             'email',
             'customer',
         ]
