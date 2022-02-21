@@ -54,7 +54,9 @@ class CustomerManager(models.Manager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(max_length=255, unique=True)
+    email = models.EmailField(max_length=255, unique=True, blank=True)
+    phone_number = PhoneNumberField(unique=True)
+    secondary_phone_number = PhoneNumberField(unique=True)
     first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255, blank=True)
     is_active = models.BooleanField(default=True)
@@ -62,7 +64,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'phone_number'
 
     def __str__(self):
         return self.email
@@ -74,10 +76,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Customer(AbstractModel):
     user = models.OneToOneField('User', on_delete=models.PROTECT, related_name='customer')
-    phone_number = PhoneNumberField(unique=True)
     payslip = models.FileField(upload_to='uploads/payslips', blank=True)
     id_file = models.FileField(upload_to='uploads/ids', blank=True)
-
+    is_blacklisted = models.BooleanField(default=False)
     objects = CustomerManager()
 
     def __str__(self):
