@@ -7,9 +7,9 @@ from app.users import models
 
 class UserAdmin(BaseUserAdmin):
     ordering = ['id']
-    list_display = ['email', 'first_name', 'last_name']
+    list_display = ['phone_number', 'first_name', 'last_name']
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        (None, {'fields': ('phone_number', 'password')}),
         (_('Personal Info'), {'fields': ('first_name', 'last_name',)}),
         (
             _('Permissions'),
@@ -27,13 +27,13 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2')
+            'fields': ('phone_number', 'password1', 'password2')
         }),
     )
 
 
 class CustomerAdmin(admin.ModelAdmin):
-    fields = ['user', 'phone_number']
+    fields = ['user']
     list_display = fields
 
 
