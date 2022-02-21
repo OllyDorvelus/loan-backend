@@ -96,6 +96,9 @@ class LoanAccount(AccountBase):
     def total(self):
         return (self.principal * self.interest_rate) + self.principal
 
+    def __str__(self):
+        return f'{self.user.full_name} - {self.balance.amount}'
+
 
 class Transaction(AbstractModel):
     amount = MoneyField(max_digits=10, decimal_places=2, default_currency=ZAR)
@@ -108,6 +111,9 @@ class Transaction(AbstractModel):
 class BankName(AbstractModel):
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
+
 
 class BankType(AbstractModel):
     CHEQUE = 'CHEQUE'
@@ -117,6 +123,9 @@ class BankType(AbstractModel):
         (SAVINGS, 'savings'),
     )
     type = models.CharField(max_length=10, choices=ACCOUNT_TYPE)
+
+    def __str__(self):
+        return f'{self.type}'
 
 
 class Bank(AbstractModel):
@@ -128,6 +137,9 @@ class Bank(AbstractModel):
                                                                 message='Account must be numeric digits',
                                                                 code='invalid_account')]
                                       )
+
+    def __str__(self):
+        return f'{self.user.full_name} - {self.bank_name} - {self.account_number}'
 
 
 # signals

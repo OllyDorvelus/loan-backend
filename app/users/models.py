@@ -20,19 +20,19 @@ class AbstractModel(models.Model):
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, phone_number, password=None, **extra_fields):
         """Creates and saves a new user"""
-        if not email:
+        if not phone_number:
             raise ValueError('User must have an email address')
 
-        user = self.model(email=self.normalize_email(email), **extra_fields)
+        user = self.model(phone_number=phone_number, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password):
+    def create_superuser(self, phone_number, password):
         """Creates and saves a new super user"""
-        user = self.create_user(email, password)
+        user = self.create_user(phone_number, password)
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
@@ -67,11 +67,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'phone_number'
 
     def __str__(self):
-        return self.email
+        return f'{self.full_name} - {self.phone_number}'
 
     @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
+
+    @property
+    def whatsapp_number(self):
+        return f'whatsapp:{self.phone_number}'
+
+    @property
+    def number(self):
+        return str(self.phone_number)
 
 
 class Customer(AbstractModel):
@@ -82,12 +90,4 @@ class Customer(AbstractModel):
     objects = CustomerManager()
 
     def __str__(self):
-        return self.user.email
-
-    @property
-    def number(self):
-        return str(self.phone_number)
-
-    @property
-    def whatsapp_number(self):
-        return f'whatsapp:{self.phone_number}'
+        return f'{self.user}'
