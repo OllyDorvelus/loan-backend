@@ -71,6 +71,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Customer(AbstractModel):
     user = models.OneToOneField('User', on_delete=models.PROTECT, related_name='customer')
     phone_number = PhoneNumberField(unique=True)
+    payslip = models.FileField(upload_to='uploads/payslips', blank=True)
+    id_file = models.FileField(upload_to='uploads/ids', blank=True)
 
     objects = CustomerManager()
 
