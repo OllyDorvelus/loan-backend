@@ -70,10 +70,15 @@ class LoanAccount(AccountBase):
         return f'{self.user.email} - {self.balance} - {self.status}'
 
     def accept(self):
-        self.status = self.ACTIVE
-        self.accepted_date = date.today()
-        self.save()
-        return self
+        if self.status == self.PENDING:
+            with trans.atomic():
+                self.status = self.ACTIVE
+                self.accepted_date = date.today()
+                self.balance = (self.balance.amount * self.interest_rate) + self.principal.amount
+            WhatsAppClient.send_accept_loan_message(self.user.whatsapp_number, self.user.full_name,
+                                                    self.due_date, self.balance.amount)
+
+            return self
 
     def close(self):
         self.status = self.CLOSED
@@ -94,7 +99,7 @@ class LoanAccount(AccountBase):
 
     @property
     def total(self):
-        return (self.principal * self.interest_rate) + self.principal
+        return self.balance.amount
 
     def __str__(self):
         return f'{self.user.full_name} - {self.balance.amount}'
@@ -105,7 +110,7 @@ class Transaction(AbstractModel):
     account = models.ForeignKey('accounts.LoanAccount', on_delete=models.CASCADE, related_name='transactions')
 
     def __str__(self):
-        return f'{self.account.user.last_name} - {self.account.balance} - {self.created}'
+        return f'{self.account.user.full_name} - {self.amount} - {self.created}'
 
 
 class BankName(AbstractModel):
@@ -148,23 +153,30 @@ def send_message_when_pending_to_active(sender, instance, **kwargs):
         old_instance = LoanAccount.objects.get(pk=instance.id)
         instance.accepted_date = date.today()
         if old_instance.status.lower() == 'pending' and instance.status.lower() == 'active':
-            WhatsAppClient.send_accept_loan_message(instance.user.customer.whatsapp_number, instance.user.first_name,
-                                                    instance.user.last_name, instance.balance, instance.due_date,
-                                                    instance.accepted_date)
-        if instance.total <= 0:
-            instance.status = 'PAID'
-            WhatsAppClient.send_paid_message(instance.user.customer.whatsapp_number, old_instance.total)
+            instance.accept()
 
 
-def send_welcome_message(sender, instance, **kwargs):
+def send_message_when_balance_becomes_zero(sender, instance, **kwargs):
+    if instance.balance.amount <= 0 and instance.id:
+        old_instance = LoanAccount.objects.get(pk=instance.id)
+        instance.status = 'PAID'
+        WhatsAppClient.send_paid_message(instance.user.customer.whatsapp_number, old_instance.balance.amount)
+
+
+def send_submitted_application_message(sender, instance, **kwargs):
     if instance.created:
-        WhatsAppClient.send_welcome_message(instance.user.customer.whatsapp_number, instance.user.first_name,
-                                            instance.user.last_name, instance.principal)
+        WhatsAppClient.send_submitted_application_message(instance.user.customer.whatsapp_number,
+                                                          instance.user.full_name,
+                                                          instance.principal)
 
+
+def send_close_message_on_status_change(sender, instance, **kwargs):
     if instance.status.lower() == 'closed':
         WhatsAppClient.send_close_message(instance.user.customer.whatsapp_number, instance.user.first_name,
                                           instance.user.last_name)
 
 
 pre_save.connect(send_message_when_pending_to_active, sender=LoanAccount)
-post_save.connect(send_welcome_message, sender=LoanAccount)
+pre_save.connect(send_message_when_balance_becomes_zero, sender=LoanAccount)
+post_save.connect(send_submitted_application_message, sender=LoanAccount)
+post_save.connect(send_close_message_on_status_change, sender=LoanAccount)
