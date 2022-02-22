@@ -22,7 +22,13 @@ class BankAdmin(admin.ModelAdmin):
     list_display = fields
 
 
+class TransactionAdmin(admin.ModelAdmin):
+    fields = ['account', 'amount', 'created']
+    list_display = fields
+
+
 admin.site.register(models.LoanAccount, LoanAccountAdmin)
 admin.site.register(models.BankName, BankNameAdmin)
 admin.site.register(models.BankType, BankTypeAdmin)
 admin.site.register(models.Bank, BankAdmin)
+admin.site.register(models.Transaction, TransactionAdmin)
