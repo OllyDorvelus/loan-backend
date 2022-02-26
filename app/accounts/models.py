@@ -176,7 +176,18 @@ def send_close_message_on_status_change(sender, instance, **kwargs):
                                           instance.user.last_name)
 
 
+def send_balance_change_message(sender, instance, **kwargs):
+    if instance.id:
+        old_instance = LoanAccount.objects.get(pk=instance.id)
+        old_amount = old_instance.balance.amount
+        new_amount = instance.balance.amount
+        if old_amount != new_amount:
+            WhatsAppClient.send_submitted_application_message(instance.user.whatsapp_number, instance.user.full_name,
+                                                              old_amount, new_amount)
+
+
 pre_save.connect(send_message_when_pending_to_active, sender=LoanAccount)
 pre_save.connect(send_message_when_balance_becomes_zero, sender=LoanAccount)
+pre_save.connect(send_balance_change_message, sender=LoanAccount)
 post_save.connect(send_submitted_application_message, sender=LoanAccount)
 post_save.connect(send_close_message_on_status_change, sender=LoanAccount)

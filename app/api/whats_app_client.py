@@ -20,8 +20,13 @@ class WhatsAppClient:
         )
 
     @staticmethod
+    def send_balance_change_message(to_number, full_name, prev_amount, new_amount):
+        msg = f'Hi {full_name}, your balance at Dimofusion has changed from {prev_amount(prev_amount)} to {format_money(new_amount)}'
+        WhatsAppClient.send_message(msg, to_number)
+
+    @staticmethod
     def send_submitted_application_message(to_number, full_name, amount):
-        msg = f'Hi {full_name} on {format_date(date.today())}, your loan application for {format_money(amount)} ' \
+        msg = f'Hi {full_name}, on {format_date(date.today())}, your loan application for {format_money(amount)} ' \
               f'Dimofusion and we will notify you on the status of your application.'
         WhatsAppClient.send_message(msg, to_number)
 
