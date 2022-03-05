@@ -27,7 +27,7 @@ def send_balance_due_warning_today_notification():
                                                         account.total, account.due_date)
         print(f'Sent notification to Customer: {account.user.full_name}')
         msg_out += 1
-    print(f'Total messages sent for balance due soon: {msg_out}')
+    print(f'Total messages sent for balance warning: {msg_out}')
 
 
 def send_balance_past_due_notification():
@@ -42,4 +42,4 @@ def send_balance_past_due_notification():
             account.save()
             print(f'Sent notification to Customer: {account.user.full_name}')
             msg_out += 1
-    print(f'Total messages sent for balance due soon: {msg_out}')
+    print(f'Total messages sent for balance past due: {msg_out}')

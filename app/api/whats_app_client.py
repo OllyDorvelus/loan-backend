@@ -53,7 +53,7 @@ class WhatsAppClient:
 
     @staticmethod
     def send_balance_due_soon_message(to_number, full_name, total, due_date):
-        msg = f'Hi {full_name}, your balance of R{total} from Dimofusion is due on {format_date(due_date)}'
+        msg = f'Hi {full_name}, your balance of R{total} from Dimofusion is due in two days on {format_date(due_date)}'
         WhatsAppClient.send_message(msg, to_number)
 
     @staticmethod
