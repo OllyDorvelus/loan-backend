@@ -7,21 +7,25 @@ account_sid = os.getenv('WA_ACCOUNT_SID')
 auth_token = os.getenv('WA_AUTH_TOKEN')
 FROM_NUMBER = os.getenv('WA_FROM_NUMBER')
 client = Client(account_sid, auth_token)
+SHOULD_SEND_MESSAGE_TO_WHATSAPP = False
 
 
 class WhatsAppClient:
 
     @staticmethod
     def send_message(msg, to_number):
-        client.messages.create(
-            body=msg,
-            from_=FROM_NUMBER,
-            to=to_number
-        )
+        if SHOULD_SEND_MESSAGE_TO_WHATSAPP:
+            client.messages.create(
+                body=msg,
+                from_=FROM_NUMBER,
+                to=to_number
+            )
+        else:
+            print(f'\n{to_number}: {msg}\n')
 
     @staticmethod
     def send_balance_change_message(to_number, full_name, prev_amount, new_amount):
-        msg = f'Hi {full_name}, your balance at Dimofusion has changed from {prev_amount(prev_amount)} to {format_money(new_amount)}'
+        msg = f'Hi {full_name}, your balance at Dimofusion has changed from {format_money(prev_amount)} to {format_money(new_amount)}'
         WhatsAppClient.send_message(msg, to_number)
 
     @staticmethod
@@ -35,12 +39,6 @@ class WhatsAppClient:
         msg = f'Hi {full_name} you have taken out a loan of R{balance}' \
               f'with Dimofusion at a 25% interest rate. The total debt payable on  {format_date(due_date)} is ' \
               f'{format_money(total)}'
-        WhatsAppClient.send_message(msg, to_number)
-
-    @staticmethod
-    def send_accept_notice(to_number, first_name, last_name, balance, due_date, accepted_date):
-        msg = f'Hi {first_name} {last_name}, Your loan of R{balance} was accepted on {format_date(accepted_date)}' \
-              f' by Dimofusion and is due on {format_date(due_date)}'
         WhatsAppClient.send_message(msg, to_number)
 
     @staticmethod

@@ -176,7 +176,7 @@ def send_message_when_balance_becomes_zero(sender, instance, **kwargs):
 
 
 def send_submitted_application_message(sender, instance, **kwargs):
-    if instance.created:
+    if kwargs['created']:
         WhatsAppClient.send_submitted_application_message(instance.user.whatsapp_number,
                                                           instance.user.full_name,
                                                           instance.principal.amount)
@@ -189,19 +189,20 @@ def send_close_message_on_status_change(sender, instance, **kwargs):
 
 
 def send_balance_change_message(sender, instance, **kwargs):
-    old_instance = LoanAccount.objects.filter(pk=instance.id).first()
-    if old_instance:
-        old_amount = old_instance.balance.amount
-        new_amount = instance.balance.amount
-        if old_amount != new_amount:
-            WhatsAppClient.send_submitted_application_message(instance.user.whatsapp_number, instance.user.full_name,
-                                                              old_amount, new_amount)
-            new_transaction = {'amount': old_amount - new_amount, 'account': instance}
-            if new_amount > old_amount:
-                new_transaction['transaction_type'] = Transaction.ADDED
-            else:
-                new_transaction['transaction_type'] = Transaction.DEDUCTED
-            Transaction.objects.create_transaction(**new_transaction)
+    with trans.atomic():
+        old_instance = LoanAccount.objects.filter(pk=instance.id).first()
+        if old_instance:
+            old_amount = old_instance.balance.amount
+            new_amount = instance.balance.amount
+            if old_amount != new_amount:
+                WhatsAppClient.send_balance_change_message(instance.user.whatsapp_number, instance.user.full_name,
+                                                           old_amount, new_amount)
+                new_transaction = {'amount': old_amount - new_amount, 'account': instance}
+                if new_amount > old_amount:
+                    new_transaction['transaction_type'] = Transaction.ADDED
+                else:
+                    new_transaction['transaction_type'] = Transaction.DEDUCTED
+                Transaction.objects.create_transaction(**new_transaction)
 
 
 pre_save.connect(send_message_when_pending_to_active, sender=LoanAccount)
