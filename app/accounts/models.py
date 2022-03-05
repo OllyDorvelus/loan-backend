@@ -40,7 +40,7 @@ class TransactionManager(models.Manager):
 
 
 class AccountBase(AbstractModel):
-    balance = MoneyField(max_digits=10, decimal_places=2, default_currency=ZAR)
+    balance = MoneyField(max_digits=10, decimal_places=2, default_currency=ZAR, blank=True, default=0.00)
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='accounts')
     accepted_date = models.DateField(blank=True, null=True)
 
@@ -76,7 +76,6 @@ class LoanAccount(AccountBase):
             with trans.atomic():
                 self.status = self.ACTIVE
                 self.accepted_date = date.today()
-                self.balance = (self.balance.amount * self.interest_rate) + self.principal.amount
             WhatsAppClient.send_accept_loan_message(self.user.whatsapp_number, self.user.full_name,
                                                     self.due_date, self.balance.amount)
 
@@ -163,7 +162,7 @@ def send_message_when_pending_to_active(sender, instance, **kwargs):
     old_instance = LoanAccount.objects.filter(pk=instance.id).first()
     if old_instance:
         instance.accepted_date = date.today()
-        if old_instance.status.lower() == 'pending' and instance.status.lower() == 'active':
+        if old_instance.status == LoanAccount.PENDING and instance.status == LoanAccount.ACTIVE:
             instance.accept()
 
 
@@ -177,9 +176,11 @@ def send_message_when_balance_becomes_zero(sender, instance, **kwargs):
 
 def send_submitted_application_message(sender, instance, **kwargs):
     if kwargs['created']:
+        instance.balance = (instance.principal.amount * instance.interest_rate) + instance.principal.amount
         WhatsAppClient.send_submitted_application_message(instance.user.whatsapp_number,
                                                           instance.user.full_name,
                                                           instance.principal.amount)
+        instance.save()
 
 
 def send_close_message_on_status_change(sender, instance, **kwargs):

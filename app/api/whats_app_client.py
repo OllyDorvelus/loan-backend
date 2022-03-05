@@ -31,7 +31,8 @@ class WhatsAppClient:
     @staticmethod
     def send_submitted_application_message(to_number, full_name, amount):
         msg = f'Hi {full_name}, on {format_date(date.today())}, your loan application for {format_money(amount)} ' \
-              f'Dimofusion and we will notify you on the status of your application.'
+              f'Dimofusion and we will notify you on the status of your application. ' \
+              f'We will let you know the interest rate and total due when your application is submitted'
         WhatsAppClient.send_message(msg, to_number)
 
     @staticmethod
