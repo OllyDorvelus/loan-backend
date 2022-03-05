@@ -23,7 +23,7 @@ class BankAdmin(admin.ModelAdmin):
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    fields = ['account', 'amount', 'created']
+    fields = ['account', 'amount']
     list_display = fields
 
 
