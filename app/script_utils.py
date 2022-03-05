@@ -32,7 +32,7 @@ def send_balance_due_warning_today_notification():
 
 def send_balance_past_due_notification():
     today = date.today()
-    accounts = LoanAccount.objects.filter(status=LoanAccount.ACTIVE, balance__amount__gt=0).select_related('user')
+    accounts = LoanAccount.objects.filter(status=LoanAccount.ACTIVE, balance_gt=0).select_related('user')
     msg_out = 0
     for account in accounts:
         WhatsAppClient.send_past_due_message(account.user.whatsapp_number, account.user.full_name,
