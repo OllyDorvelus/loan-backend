@@ -160,36 +160,37 @@ class Bank(AbstractModel):
 
 # signals
 def send_message_when_pending_to_active(sender, instance, **kwargs):
-    if instance.id:
-        old_instance = LoanAccount.objects.get(pk=instance.id)
+    old_instance = LoanAccount.objects.filter(pk=instance.id).first()
+    if old_instance:
         instance.accepted_date = date.today()
         if old_instance.status.lower() == 'pending' and instance.status.lower() == 'active':
             instance.accept()
 
 
 def send_message_when_balance_becomes_zero(sender, instance, **kwargs):
-    if instance.balance.amount <= 0 and instance.id:
-        old_instance = LoanAccount.objects.get(pk=instance.id)
-        instance.status = 'PAID'
-        WhatsAppClient.send_paid_message(instance.user.customer.whatsapp_number, old_instance.balance.amount)
+    old_instance = LoanAccount.objects.filter(pk=instance.id).first()
+    if old_instance:
+        if instance.balance.amount <= 0 and instance.id:
+            instance.status = 'PAID'
+            WhatsAppClient.send_paid_message(instance.user.whatsapp_number, old_instance.balance.amount)
 
 
 def send_submitted_application_message(sender, instance, **kwargs):
     if instance.created:
-        WhatsAppClient.send_submitted_application_message(instance.user.customer.whatsapp_number,
+        WhatsAppClient.send_submitted_application_message(instance.user.whatsapp_number,
                                                           instance.user.full_name,
-                                                          instance.principal)
+                                                          instance.principal.amount)
 
 
 def send_close_message_on_status_change(sender, instance, **kwargs):
     if instance.status.lower() == 'closed':
-        WhatsAppClient.send_close_message(instance.user.customer.whatsapp_number, instance.user.first_name,
+        WhatsAppClient.send_close_message(instance.user.whatsapp_number, instance.user.first_name,
                                           instance.user.last_name)
 
 
 def send_balance_change_message(sender, instance, **kwargs):
-    if instance.id:
-        old_instance = LoanAccount.objects.get(pk=instance.id)
+    old_instance = LoanAccount.objects.filter(pk=instance.id).first()
+    if old_instance:
         old_amount = old_instance.balance.amount
         new_amount = instance.balance.amount
         if old_amount != new_amount:

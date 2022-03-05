@@ -3,7 +3,7 @@ from app.accounts import models
 
 
 class LoanAccountAdmin(admin.ModelAdmin):
-    fields = ['user', 'balance', 'principal', 'status', 'due_date']
+    fields = ['user', 'balance', 'principal', 'interest_rate', 'status', 'due_date']
     list_display = fields
 
 
