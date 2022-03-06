@@ -98,6 +98,10 @@ class LoanAccount(AccountBase):
             self.balance.amount -= amount
             self.save()
 
+    def apply_interest(self):
+        self.balance = (self.principal.amount * self.interest_rate) + self.principal.amount
+        self.save()
+
     @property
     def total(self):
         return self.balance.amount
@@ -176,11 +180,10 @@ def send_message_when_balance_becomes_zero(sender, instance, **kwargs):
 
 def send_submitted_application_message(sender, instance, **kwargs):
     if kwargs['created']:
-        instance.balance = (instance.principal.amount * instance.interest_rate) + instance.principal.amount
+        instance.apply_interest()
         WhatsAppClient.send_submitted_application_message(instance.user.whatsapp_number,
                                                           instance.user.full_name,
                                                           instance.principal.amount)
-        instance.save()
 
 
 def send_close_message_on_status_change(sender, instance, **kwargs):
