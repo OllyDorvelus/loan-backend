@@ -3,4 +3,4 @@ def format_date(date):
 
 
 def format_money(amount):
-    return f'R{amount:,.2f}'.replace(',', ' ').replace('.', ',')
+    return f"R{amount:,.2f}".replace(",", " ").replace(".", ",")

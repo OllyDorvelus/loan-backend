@@ -10,29 +10,39 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('accounts', '0001_initial'),
+        ("accounts", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='loanaccount',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='accounts', to=settings.AUTH_USER_MODEL),
+            model_name="loanaccount",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="accounts",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='bank',
-            name='bank_name',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='accounts.bankname'),
+            model_name="bank",
+            name="bank_name",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="accounts.bankname"
+            ),
         ),
         migrations.AddField(
-            model_name='bank',
-            name='bank_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='accounts.banktype'),
+            model_name="bank",
+            name="bank_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="accounts.banktype"
+            ),
         ),
         migrations.AddField(
-            model_name='bank',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="bank",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

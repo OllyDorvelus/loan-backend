@@ -7,13 +7,19 @@ import djmoney.models.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0004_alter_loanaccount_balance'),
+        ("accounts", "0004_alter_loanaccount_balance"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='loanaccount',
-            name='balance',
-            field=djmoney.models.fields.MoneyField(blank=True, decimal_places=2, default_currency='ZAR', max_digits=10, null=True),
+            model_name="loanaccount",
+            name="balance",
+            field=djmoney.models.fields.MoneyField(
+                blank=True,
+                decimal_places=2,
+                default_currency="ZAR",
+                max_digits=10,
+                null=True,
+            ),
         ),
     ]

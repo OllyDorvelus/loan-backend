@@ -2,8 +2,15 @@ from datetime import date
 from moneyed import ZAR
 from djmoney.contrib.django_rest_framework import MoneyField
 from rest_framework import serializers
-from app.accounts.models import LoanAccount
+from app.accounts.models import LoanAccount, Bank, BankType, BankName
 from app.api.serializers.users import UserSerializer
+
+
+class BankSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Bank
 
 
 class AccountSerializer(serializers.ModelSerializer):
@@ -12,30 +19,34 @@ class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = LoanAccount
         fields = [
-            'id',
-            'balance',
-            'due_date',
-            'status',
-            'user',
+            "id",
+            "balance",
+            "due_date",
+            "status",
+            "user",
         ]
 
 
 class CreateLoanApplicationSerializer(serializers.ModelSerializer):
-    balance = MoneyField(write_only=True, max_digits=9, decimal_places=2, default_currency=ZAR)
-    balance_confirm = MoneyField(write_only=True, max_digits=9, decimal_places=2, default_currency=ZAR)
+    balance = MoneyField(
+        write_only=True, max_digits=9, decimal_places=2, default_currency=ZAR
+    )
+    balance_confirm = MoneyField(
+        write_only=True, max_digits=9, decimal_places=2, default_currency=ZAR
+    )
     due_date = serializers.DateField(read_only=True)
     status = serializers.CharField(read_only=True)
 
     class Meta:
         model = LoanAccount
-        fields = ('balance', 'balance_confirm', 'due_date', 'status')
+        fields = ("balance", "balance_confirm", "due_date", "status")
 
     def validate(self, attrs):
-        balance = attrs.get('balance')
-        balance_confirm = attrs.get('balance_confirm')
+        balance = attrs.get("balance")
+        balance_confirm = attrs.get("balance_confirm")
 
         if balance != balance_confirm:
-            msg = {'balance confirm': ['Balance amount must match.']}
+            msg = {"balance confirm": ["Balance amount must match."]}
             raise serializers.ValidationError(msg)
 
         return attrs
@@ -43,7 +54,7 @@ class CreateLoanApplicationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get("request")
         if request and hasattr(request, "user"):
-            del validated_data['balance_confirm']
-            validated_data['due_date'] = date(2099, 1, 1)
-            validated_data['user'] = request.user
+            del validated_data["balance_confirm"]
+            validated_data["due_date"] = date(2099, 1, 1)
+            validated_data["user"] = request.user
             return LoanAccount.objects.create_loan_account(**validated_data)

@@ -1,8 +1,11 @@
 import uuid
 
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
-    PermissionsMixin
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
 from phonenumber_field.modelfields import PhoneNumberField
 
 
@@ -19,11 +22,10 @@ class AbstractModel(models.Model):
 
 
 class UserManager(BaseUserManager):
-
     def create_user(self, phone_number, password=None, **extra_fields):
         """Creates and saves a new user"""
         if not phone_number:
-            raise ValueError('User must have an email address')
+            raise ValueError("User must have an email address")
 
         user = self.model(phone_number=phone_number, **extra_fields)
         user.set_password(password)
@@ -64,18 +66,18 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'phone_number'
+    USERNAME_FIELD = "phone_number"
 
     def __str__(self):
-        return f'{self.full_name} - {self.phone_number}'
+        return f"{self.full_name} - {self.phone_number}"
 
     @property
     def full_name(self):
-        return f'{self.first_name} {self.last_name}'
+        return f"{self.first_name} {self.last_name}"
 
     @property
     def whatsapp_number(self):
-        return f'whatsapp:{self.phone_number}'
+        return f"whatsapp:{self.phone_number}"
 
     @property
     def number(self):
@@ -83,11 +85,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Customer(AbstractModel):
-    user = models.OneToOneField('User', on_delete=models.PROTECT, related_name='customer')
-    payslip = models.FileField(upload_to='uploads/payslips', blank=True)
-    id_file = models.FileField(upload_to='uploads/ids', blank=True)
+    user = models.OneToOneField(
+        "User", on_delete=models.PROTECT, related_name="customer"
+    )
+    payslip = models.FileField(upload_to="uploads/payslips", blank=True)
+    id_file = models.FileField(upload_to="uploads/ids", blank=True)
     is_blacklisted = models.BooleanField(default=False)
     objects = CustomerManager()
 
     def __str__(self):
-        return f'{self.user}'
+        return f"{self.user}"

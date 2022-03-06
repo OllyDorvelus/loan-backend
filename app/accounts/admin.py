@@ -3,27 +3,27 @@ from app.accounts import models
 
 
 class LoanAccountAdmin(admin.ModelAdmin):
-    fields = ['user', 'balance', 'principal', 'interest_rate', 'status', 'due_date']
+    fields = ["user", "balance", "principal", "interest_rate", "status", "due_date"]
     list_display = fields
 
 
 class BankTypeAdmin(admin.ModelAdmin):
-    fields = ['type']
+    fields = ["type"]
     list_display = fields
 
 
 class BankNameAdmin(admin.ModelAdmin):
-    fields = ['name']
+    fields = ["name"]
     list_display = fields
 
 
 class BankAdmin(admin.ModelAdmin):
-    fields = ['user', 'bank_name', 'bank_type', 'account_number']
+    fields = ["user", "bank_name", "bank_type", "account_number"]
     list_display = fields
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    fields = ['account', 'amount']
+    fields = ["account", "amount"]
     list_display = fields
 
 

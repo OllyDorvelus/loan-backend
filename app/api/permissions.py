@@ -6,7 +6,7 @@ class IsAdminOrObjectOwnerToRead(permissions.BasePermission):
     Handles permissions for users.  The basic rules are
      - owner may GET, PUT, POST, DELETE
      - nobody else can access
-     """
+    """
 
     def has_permission(self, request, view):
         return request.user.is_superuser
@@ -23,6 +23,10 @@ class IsAdminOrObjectOwnerToRead(permissions.BasePermission):
 
 class AuthenticatedCantPost(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.method == 'POST' and request.user.is_authenticated  and not request.user.is_superuser:
+        if (
+            request.method == "POST"
+            and request.user.is_authenticated
+            and not request.user.is_superuser
+        ):
             return False
         return True

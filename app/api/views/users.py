@@ -8,10 +8,10 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AuthenticatedCantPost]
-    lookup_field = 'customer__pk'
+    lookup_field = "customer__pk"
 
     def get_serializer_class(self):
         serializer_class = self.serializer_class
-        if self.action == 'create':
+        if self.action == "create":
             serializer_class = UserCreateSerializer
         return serializer_class
