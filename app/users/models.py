@@ -43,22 +43,20 @@ class UserManager(BaseUserManager):
 
 
 class CustomerManager(models.Manager):
-    def create_customer(self, user, phone_number, **extra_fields):
+    def create_customer(self, user, **extra_fields):
         """Create and save a new customer"""
         if not user:
             raise ValueError("Customer must have a user")
-        if not phone_number:
-            raise ValueError("Customer must have phone number")
 
-        customer = self.model(user=user, phone_number=phone_number, **extra_fields)
+        customer = self.model(user=user, **extra_fields)
         customer.save(using=self._db)
         return customer
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(max_length=255, unique=True, blank=True)
+    email = models.EmailField(max_length=255, unique=True, blank=True, null=True)
     phone_number = PhoneNumberField(unique=True)
-    secondary_phone_number = PhoneNumberField(unique=True)
+    secondary_phone_number = PhoneNumberField(unique=True, null=True)
     first_name = models.CharField(max_length=255, blank=False)
     last_name = models.CharField(max_length=255, blank=False)
     is_active = models.BooleanField(default=True)
