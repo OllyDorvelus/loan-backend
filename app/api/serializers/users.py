@@ -106,7 +106,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             user = User.objects.create_user(**validated_data)
             Customer.objects.create_customer(user=user)
-            return UserSerializer(user).data
+            return user
 
     def update(self, instance, validated_data):
         """Update a user, setting the password correctly and return it"""
