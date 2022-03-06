@@ -2,7 +2,7 @@ from datetime import date
 from moneyed import ZAR
 from djmoney.contrib.django_rest_framework import MoneyField
 from rest_framework import serializers
-from app.accounts.models import LoanAccount, Bank, BankType, BankName
+from app.accounts.models import LoanAccount, Bank
 from app.api.serializers.users import UserSerializer
 
 

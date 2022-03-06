@@ -25,7 +25,8 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "phone_number",
-            "secondary_phone_number" "email",
+            "secondary_phone_number",
+            "email",
             "customer",
         ]
 
@@ -33,6 +34,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserCreateSerializer(serializers.ModelSerializer):
     """Serializer for the users object"""
 
+    email = serializers.EmailField(required=False)
     password_confirm = serializers.CharField(
         min_length=8,
         trim_whitespace=False,
@@ -40,10 +42,13 @@ class UserCreateSerializer(serializers.ModelSerializer):
         write_only=True,
     )
     email_confirm = serializers.EmailField(
-        trim_whitespace=True, style={"input_type": "email"}, write_only=True
+        trim_whitespace=True,
+        style={"input_type": "email"},
+        write_only=True,
+        required=False,
     )
-    phone_number = PhoneNumberField(write_only=True)
-    phone_number_confirm = PhoneNumberField(write_only=True)
+    phone_number = PhoneNumberField(write_only=True, trim_whitespace=True)
+    phone_number_confirm = PhoneNumberField(write_only=True, trim_whitespace=True)
 
     class Meta:
         model = User
@@ -77,7 +82,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
             msg = {"password_confirm": ["Passwords must match."]}
             raise serializers.ValidationError(msg)
 
-        if email != email_confirm:
+        if email and email_confirm and email != email_confirm:
             msg = {"email_confirm": ["Emails must match."]}
             raise serializers.ValidationError(msg)
 
@@ -89,16 +94,19 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """ "Create a new user with encrypted password and return it"""
+        email = validated_data.get("email_confirm")
+        email_confirm = validated_data.get("email_confirm")
+        if email and email_confirm:
+            del validated_data["email"]
+            del validated_data["email_confirm"]
         del validated_data["password_confirm"]
-        del validated_data["email_confirm"]
         del validated_data["phone_number_confirm"]
-        phone_number = validated_data.pop("phone_number")
 
         # ensure nothing gets created in case of failure.
         with transaction.atomic():
             user = User.objects.create_user(**validated_data)
-            Customer.objects.create_customer(user=user, phone_number=phone_number)
-            return user
+            Customer.objects.create_customer(user=user)
+            return UserSerializer(user).data
 
     def update(self, instance, validated_data):
         """Update a user, setting the password correctly and return it"""
