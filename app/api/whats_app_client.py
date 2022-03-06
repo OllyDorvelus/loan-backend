@@ -1,7 +1,7 @@
 import os
 from datetime import date
 from twilio.rest import Client
-from app.utils import format_date, apply_interest, format_money
+from app.utils import format_date, format_money
 
 account_sid = os.getenv('WA_ACCOUNT_SID')
 auth_token = os.getenv('WA_AUTH_TOKEN')

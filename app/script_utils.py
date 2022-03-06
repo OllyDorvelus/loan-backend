@@ -19,7 +19,7 @@ def send_balance_due_soon_notification():
 
 def send_balance_due_warning_today_notification():
     today = date.today()
-    accounts = LoanAccount.objects.filter(status=LoanAccount.ACTIVE, balance_gt=0,
+    accounts = LoanAccount.objects.filter(status=LoanAccount.ACTIVE, balance__gt=0,
                                           due_date=today).select_related('user')
     msg_out = 0
     for account in accounts:
@@ -32,14 +32,14 @@ def send_balance_due_warning_today_notification():
 
 def send_balance_past_due_notification():
     today = date.today()
-    accounts = LoanAccount.objects.filter(status=LoanAccount.ACTIVE, balance_gt=0).select_related('user')
+    accounts = LoanAccount.objects.filter(status=LoanAccount.ACTIVE, balance__gt=0).select_related('user')
     msg_out = 0
     for account in accounts:
         WhatsAppClient.send_past_due_message(account.user.whatsapp_number, account.user.full_name,
                                              account.total, account.due_date)
         if (today - account.due_date).days >= 2:
             account.status = LoanAccount.PAST_DUE
-            account.save()
+            account.apply_interest()
             print(f'Sent notification to Customer: {account.user.full_name}')
             msg_out += 1
     print(f'Total messages sent for balance past due: {msg_out}')
