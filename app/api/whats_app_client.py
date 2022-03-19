@@ -19,6 +19,11 @@ class WhatsAppClient:
             print(f"\n{to_number}: {msg}\n")
 
     @staticmethod
+    def send_account_created_message(to_number, full_name):
+        msg = f"Welcome to Dimofusion {full_name}."
+        WhatsAppClient.send_message(to_number, msg)
+
+    @staticmethod
     def send_balance_change_message(to_number, full_name, prev_amount, new_amount):
         msg = f"Hi {full_name}, your balance at Dimofusion has changed from {format_money(prev_amount)} to {format_money(new_amount)}"
         WhatsAppClient.send_message(msg, to_number)

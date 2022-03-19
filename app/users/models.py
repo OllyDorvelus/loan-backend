@@ -1,12 +1,14 @@
 import uuid
 
 from django.db import models
+from django.db.models.signals import post_save
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
     PermissionsMixin,
 )
 from phonenumber_field.modelfields import PhoneNumberField
+from app.api.whats_app_client import WhatsAppClient
 
 
 class AbstractModel(models.Model):
@@ -93,3 +95,14 @@ class Customer(AbstractModel):
 
     def __str__(self):
         return f"{self.user}"
+
+
+# signals
+def send_welcome_message(sender, instance, **kwargs):
+    if kwargs["created"]:
+        WhatsAppClient.send_account_created_message(
+            instance.whatsapp_number, instance.full_name
+        )
+
+
+post_save.connect(send_welcome_message, sender=User)
