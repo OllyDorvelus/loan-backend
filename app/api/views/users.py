@@ -29,6 +29,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+
         return Response(
             UserSerializer(user).data, status=HTTP_201_CREATED, headers=headers
         )
