@@ -169,7 +169,9 @@ class BankType(AbstractModel):
 
 
 class Bank(AbstractModel):
-    user = models.ForeignKey("users.User", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        "users.User", related_name="banks", on_delete=models.CASCADE
+    )
     bank_name = models.ForeignKey("accounts.BankName", on_delete=models.CASCADE)
     bank_type = models.ForeignKey("accounts.BankType", on_delete=models.CASCADE)
     account_number = models.CharField(

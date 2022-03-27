@@ -2,15 +2,8 @@ from datetime import date
 from moneyed import ZAR
 from djmoney.contrib.django_rest_framework import MoneyField
 from rest_framework import serializers
-from app.accounts.models import LoanAccount, Bank
+from app.accounts.models import LoanAccount
 from app.api.serializers.users import UserSerializer
-
-
-class BankSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-
-    class Meta:
-        model = Bank
 
 
 class AccountSerializer(serializers.ModelSerializer):
@@ -18,13 +11,13 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LoanAccount
-        fields = [
+        fields = (
             "id",
+            "user",
             "balance",
             "due_date",
             "status",
-            "user",
-        ]
+        )
 
 
 class CreateLoanApplicationSerializer(serializers.ModelSerializer):

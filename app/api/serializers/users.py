@@ -2,6 +2,34 @@ from rest_framework import serializers
 from app.users.models import User, Customer
 from phonenumber_field.serializerfields import PhoneNumberField
 from django.db import transaction
+from app.accounts.models import Bank, BankType, BankName
+
+
+class BankNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BankName
+        fields = (
+            "id",
+            "name",
+        )
+
+
+class BankTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BankType
+        fields = (
+            "id",
+            "type",
+        )
+
+
+class BankSerializer(serializers.ModelSerializer):
+    bank_name = BankNameSerializer(read_only=True)
+    bank_type = BankTypeSerializer(read_only=True)
+
+    class Meta:
+        model = Bank
+        fields = ("id", "bank_name", "bank_type", "account_number")
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -18,6 +46,7 @@ class CustomerSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     customer = CustomerSerializer(read_only=True)
+    banks = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
@@ -28,7 +57,14 @@ class UserSerializer(serializers.ModelSerializer):
             "secondary_phone_number",
             "email",
             "customer",
+            "banks",
         ]
+
+    def get_banks(self, instance):
+        banks = None
+        if instance.banks:
+            return BankSerializer(instance.banks, many=True).data
+        return banks
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
