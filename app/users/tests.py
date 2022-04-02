@@ -12,7 +12,6 @@ class UserModelsTestCase(TestCase):
         self.customer_one = mixer.blend(Customer, user=self.user_one)
 
     def test_full_name_property(self):
-        """Animals that can speak are correctly identified"""
         self.assertEqual(self.user_one.full_name, "First Last")
 
     def test_whatsapp_property(self):
