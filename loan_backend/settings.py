@@ -49,6 +49,7 @@ class Base(Configuration):
         "phonenumber_field",
         "djmoney",
         "dj_rest_auth",
+        "django_nextjs",
     ]
 
     INSTALLED_APPS = DJANGO_APPS + MY_APPS + THIRD_PARTY_APPS
@@ -139,11 +140,11 @@ class Dev(Base):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql_psycopg2",
-            "HOST": "jelani.db.elephantsql.com",
+            "HOST": os.getenv("LOAN_DB_HOST"),
             "NAME": os.getenv("LOAN_DB_NAME"),
-            "USER": os.getenv("LOAN_DB_NAME"),
+            "USER": os.getenv("LOAN_DB_USER"),
             "PASSWORD": os.getenv("LOAN_DB_PASSWORD"),
-            "PORT": "5432",
+            "PORT": os.getenv("LOAN_DB_PORT"),
         }
     }
 
