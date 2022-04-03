@@ -7,7 +7,7 @@ from app.api.whats_app_client import WhatsAppClient
 from datetime import date
 from django.core.validators import RegexValidator
 from decimal import Decimal
-from app.utils import format_date, format_money
+from app.utils import format_money
 
 
 # managers
