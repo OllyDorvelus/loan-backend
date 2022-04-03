@@ -6,6 +6,8 @@ from django.db.models.signals import pre_save, post_save
 from app.api.whats_app_client import WhatsAppClient
 from datetime import date
 from django.core.validators import RegexValidator
+from decimal import Decimal
+from app.utils import format_date, format_money
 
 
 # managers
@@ -81,7 +83,9 @@ class LoanAccount(AccountBase):
     principal = MoneyField(max_digits=10, decimal_places=2, default_currency=ZAR)
     due_date = models.DateField()
     status = models.CharField(max_length=14, choices=LOAN_STATUS, default="PENDING")
-    interest_rate = models.DecimalField(max_digits=2, decimal_places=2, default=0.25)
+    interest_rate = models.DecimalField(
+        max_digits=2, decimal_places=2, default=Decimal(0.25)
+    )
     objects = AccountManager()
 
     def __str__(self):
@@ -107,15 +111,15 @@ class LoanAccount(AccountBase):
         return self
 
     def add(self, amount):
+        decimal_amount = Decimal(amount)
         with trans.atomic():
-            Transaction.objects.create(self, amount)
-            self.balance.amount += amount
+            self.balance.amount += decimal_amount
             self.save()
 
     def subtract(self, amount):
         with trans.atomic():
-            Transaction.objects.create(self, amount * -1)
-            self.balance.amount -= amount
+            decimal_amount = Decimal(amount)
+            self.balance.amount -= decimal_amount
             self.save()
 
     def apply_interest(self):
@@ -129,7 +133,7 @@ class LoanAccount(AccountBase):
         return self.balance.amount
 
     def __str__(self):
-        return f"{self.user.full_name} - {self.balance.amount}"
+        return f"{self.user.full_name} - {self.principal.amount:.2f} - {self.balance.amount:.2f}"
 
 
 class Transaction(AbstractModel):
@@ -145,7 +149,7 @@ class Transaction(AbstractModel):
     objects = TransactionManager()
 
     def __str__(self):
-        return f"{self.account.user.full_name} - {self.amount} - {self.created}"
+        return f"{self.account.user.full_name} - {format_money(self.amount.amount)}"
 
 
 class BankName(AbstractModel):
@@ -244,7 +248,7 @@ def send_balance_change_message(sender, instance, **kwargs):
                     new_amount,
                 )
                 new_transaction = {
-                    "amount": old_amount - new_amount,
+                    "amount": new_amount - old_amount,
                     "account": instance,
                 }
                 if new_amount > old_amount:
