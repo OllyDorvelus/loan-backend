@@ -2,7 +2,6 @@ from django.test import TestCase
 from mixer.backend.django import mixer
 from app.users.models import User
 from app.accounts.models import LoanAccount, Bank, BankName, BankType, Transaction
-from djmoney.money import Money
 from unittest.mock import patch
 
 
