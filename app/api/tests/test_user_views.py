@@ -1,55 +1,130 @@
-from django.test import TestCase
-from mixer.backend.django import mixer
+from django.test import TestCase, Client
+import json
+from app.users.models import User
 from app.api.serializers.users import UserCreateSerializer
 from copy import deepcopy
+import pytest
+
+BASE_URL = "/api/users"
+client = Client()
 
 
-class UserViewsTestCase(TestCase):
-    def setUp(self):
-        self.serializer_data = {
-            "email": "email@email.com",
-            "email_confirm": "email@email.com",
-            "first_name": "First",
-            "last_name": "Last",
-            "password": "password",
-            "password_confirm": "password",
-            "phone_number": "+12345678901",
-            "phone_number_confirm": "+12345678901",
-        }
+@pytest.fixture()
+def serializer_data():
+    return {
+        "email": "email@email.com",
+        "email_confirm": "email@email.com",
+        "first_name": "First",
+        "last_name": "Last",
+        "password": "password",
+        "password_confirm": "password",
+        "phone_number": "+12345678901",
+        "phone_number_confirm": "+12345678901",
+    }
 
-    def test_successful_serializer_data(self):
-        no_email_serializer_data = deepcopy(self.serializer_data)
-        no_email_serializer_data.pop("email")
-        no_email_serializer_data.pop("email_confirm")
-        user_create_serializer = UserCreateSerializer(data=self.serializer_data)
-        no_email_create_user_serializer = UserCreateSerializer(
-            data=no_email_serializer_data
-        )
-        self.assertTrue(user_create_serializer.is_valid())
-        user = user_create_serializer.create(self.serializer_data)
-        self.assertTrue(user.customer)
-        self.assertTrue(no_email_create_user_serializer.is_valid())
 
-    def test_emails_dont_match_invalid_serializer_data(self):
-        mismatch_emails_serializer_data = deepcopy(self.serializer_data)
-        mismatch_emails_serializer_data["email_confirm"] = "email@emai.com"
-        user_create_serializer = UserCreateSerializer(
-            data=mismatch_emails_serializer_data
-        )
-        self.assertFalse(user_create_serializer.is_valid())
+# class UserViewsTestCase(TestCase):
+#     def setUp(self):
+#         self.client = Client()
+#         self.user = User.objects.create_user(
+#             "+1234567891", first_name="First", password="password"
+#         )
+#         self.admin_user = User.objects.create_superuser(
+#             "+1234567892", password="password"
+#         )
+#         self.serializer_data = {
+#             "email": "email@email.com",
+#             "email_confirm": "email@email.com",
+#             "first_name": "First",
+#             "last_name": "Last",
+#             "password": "password",
+#             "password_confirm": "password",
+#             "phone_number": "+12345678901",
+#             "phone_number_confirm": "+12345678901",
+#         }
+#
+@pytest.mark.django_db
+def test_successful_serializer_data(serializer_data):
+    no_email_serializer_data = deepcopy(serializer_data)
+    no_email_serializer_data.pop("email")
+    no_email_serializer_data.pop("email_confirm")
+    user_create_serializer = UserCreateSerializer(data=serializer_data)
+    no_email_create_user_serializer = UserCreateSerializer(
+        data=no_email_serializer_data
+    )
+    assert user_create_serializer.is_valid()
+    user = user_create_serializer.create(serializer_data)
+    assert user.customer
+    assert no_email_create_user_serializer.is_valid()
 
-    def test_passwords_dont_match_invalid_serializer_data(self):
-        mismatch_passwords_serializer_data = deepcopy(self.serializer_data)
-        mismatch_passwords_serializer_data["password_confirm"] = "passwor"
-        user_create_serializer = UserCreateSerializer(
-            data=mismatch_passwords_serializer_data
-        )
-        self.assertFalse(user_create_serializer.is_valid())
 
-    def test_phone_numbers_dont_match_phone_number_serializer(self):
-        mismatch_emails_serializer_data = deepcopy(self.serializer_data)
-        mismatch_emails_serializer_data["phone_number_confirm"] = "+12345678900"
-        user_create_serializer = UserCreateSerializer(
-            data=mismatch_emails_serializer_data
-        )
-        self.assertFalse(user_create_serializer.is_valid())
+@pytest.mark.django_db
+def test_emails_dont_match_invalid_serializer_data(serializer_data):
+    mismatch_emails_serializer_data = deepcopy(serializer_data)
+    mismatch_emails_serializer_data["email_confirm"] = "email@emai.com"
+    user_create_serializer = UserCreateSerializer(data=mismatch_emails_serializer_data)
+    assert user_create_serializer.is_valid() is False
+
+
+def test_passwords_dont_match_invalid_serializer_data(serializer_data):
+    mismatch_passwords_serializer_data = deepcopy(serializer_data)
+    mismatch_passwords_serializer_data["password_confirm"] = "passwor"
+    user_create_serializer = UserCreateSerializer(
+        data=mismatch_passwords_serializer_data
+    )
+    assert user_create_serializer.is_valid() is False
+
+
+def test_phone_numbers_dont_match_phone_number_serializer(serializer_data):
+    mismatch_emails_serializer_data = deepcopy(serializer_data)
+    mismatch_emails_serializer_data["phone_number_confirm"] = "+12345678900"
+    user_create_serializer = UserCreateSerializer(data=mismatch_emails_serializer_data)
+    assert user_create_serializer.is_valid() is False
+
+
+def test_anon_user_cant_view_users_list_and_detail(auth_user):
+    response = client.get(f"{BASE_URL}/")
+    assert response.status_code == 401
+    response = client.get(f"{BASE_URL}/{auth_user.customer.pk}/")
+    assert response.status_code == 401
+
+
+def test_auth_user_cant_view_users_list(auth_user):
+    client.force_login(auth_user)
+    response = client.get(f"{BASE_URL}/")
+    assert response.status_code == 403
+
+
+def test_admin_can_view_users_list(admin_user):
+    client.force_login(admin_user)
+    response = client.get(f"{BASE_URL}/")
+    assert response.status_code == 200
+
+
+def test_user_can_view_own_info_but_cant_view_others(auth_user, other_user):
+    client.force_login(auth_user)
+    response = client.get(f"{BASE_URL}/{auth_user.customer.pk}/")
+    assert response.status_code == 200
+    body = json.loads(response.content)
+    assert body["first_name"] == "First"
+    response = client.get(f"{BASE_URL}/{other_user.customer.pk}/")
+    assert response.status_code == 403
+
+
+def test_admin_can_view_any_user(admin_user, auth_user):
+    client.force_login(admin_user)
+    response = client.get(f"{BASE_URL}/{auth_user.customer.pk}/")
+    body = json.loads(response.content)
+    assert response.status_code == 200
+    assert body["first_name"] == "First"
+
+
+def test_auth_user_cant_create_user(auth_user, serializer_data):
+    client.force_login(auth_user)
+    data = deepcopy(serializer_data)
+    data["phone_number"] = "+12345678900"
+    data["phone_number_confirm"] = "+12345678900"
+    data["email"] = "email2@email.com"
+    data["email_confirm"] = "email2@email.com"
+    response = client.post(f"{BASE_URL}/", data)
+    assert response.status_code == 403
