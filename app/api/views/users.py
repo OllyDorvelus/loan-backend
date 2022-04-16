@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from app.api.serializers.users import UserCreateSerializer, UserSerializer
 from app.users.models import User
-from app.api.permissions import AuthenticatedCantPost
+from app.api.permissions import AuthenticatedCantPost, IsAdminOrUserOwner
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED
@@ -10,7 +10,7 @@ from rest_framework.status import HTTP_201_CREATED
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminOrUserOwner]
     lookup_field = "customer__pk"
 
     def get_serializer_class(self):
@@ -22,6 +22,8 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == "create":
             self.permission_classes = [AuthenticatedCantPost]
+        if self.action == "list":
+            self.permission_classes = [IsAdminUser]
         return super(UserViewSet, self).get_permissions()
 
     def create(self, request, *args, **kwargs):
