@@ -2,34 +2,7 @@ from rest_framework import serializers
 from app.users.models import User, Customer
 from phonenumber_field.serializerfields import PhoneNumberField
 from django.db import transaction
-from app.accounts.models import Bank, BankType, BankName
-
-
-class BankNameSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BankName
-        fields = (
-            "id",
-            "name",
-        )
-
-
-class BankTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BankType
-        fields = (
-            "id",
-            "type",
-        )
-
-
-class BankSerializer(serializers.ModelSerializer):
-    bank_name = BankNameSerializer(read_only=True)
-    bank_type = BankTypeSerializer(read_only=True)
-
-    class Meta:
-        model = Bank
-        fields = ("id", "bank_name", "bank_type", "account_number")
+from app.api.serializers.banks import BankSerializer
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -137,12 +110,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
             del validated_data["email_confirm"]
         del validated_data["password_confirm"]
         del validated_data["phone_number_confirm"]
-
-        # ensure nothing gets created in case of failure.
-        with transaction.atomic():
-            user = User.objects.create_user(**validated_data)
-            Customer.objects.create_customer(user=user)
-            return user
+        user = User.objects.create_user(**validated_data)
+        return user
 
     def update(self, instance, validated_data):
         """Update a user, setting the password correctly and return it"""
