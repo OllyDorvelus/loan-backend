@@ -1,9 +1,9 @@
-from django.test import TestCase, Client
+import pytest
+from django.test import Client
 import json
-from app.users.models import User
 from app.api.serializers.users import UserCreateSerializer
 from copy import deepcopy
-import pytest
+
 
 BASE_URL = "/api/users"
 client = Client()
@@ -23,26 +23,6 @@ def serializer_data():
     }
 
 
-# class UserViewsTestCase(TestCase):
-#     def setUp(self):
-#         self.client = Client()
-#         self.user = User.objects.create_user(
-#             "+1234567891", first_name="First", password="password"
-#         )
-#         self.admin_user = User.objects.create_superuser(
-#             "+1234567892", password="password"
-#         )
-#         self.serializer_data = {
-#             "email": "email@email.com",
-#             "email_confirm": "email@email.com",
-#             "first_name": "First",
-#             "last_name": "Last",
-#             "password": "password",
-#             "password_confirm": "password",
-#             "phone_number": "+12345678901",
-#             "phone_number_confirm": "+12345678901",
-#         }
-#
 @pytest.mark.django_db
 def test_successful_serializer_data(serializer_data):
     no_email_serializer_data = deepcopy(serializer_data)
