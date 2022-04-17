@@ -26,7 +26,7 @@ class AccountManager(models.Manager):
 
         account = self.model(
             user=user,
-            princpial=principal,
+            principal=principal,
             due_date=due_date,
             status=status,
             **extra_fields,
