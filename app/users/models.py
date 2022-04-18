@@ -35,9 +35,9 @@ class UserManager(BaseUserManager):
         Customer.objects.create_customer(user)
         return user
 
-    def create_superuser(self, phone_number, password):
+    def create_superuser(self, phone_number, password=None, **extra_fields):
         """Creates and saves a new super user"""
-        user = self.create_user(phone_number, password)
+        user = self.create_user(phone_number, password, **extra_fields)
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)

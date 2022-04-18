@@ -1,7 +1,6 @@
 import pytest
 import json
 from django.test import Client
-from mixer.backend.django import Mixer
 
 BASE_URL = "/api/accounts"
 

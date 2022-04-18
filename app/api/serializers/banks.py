@@ -34,4 +34,15 @@ class BankCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Bank
-        fields = "__all__"
+        fields = [
+            "id",
+            "account_number",
+            "bank_name",
+            "bank_type",
+        ]
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            validated_data["user"] = request.user
+            return Bank.objects.create(**validated_data)
