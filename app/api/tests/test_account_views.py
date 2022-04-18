@@ -65,6 +65,17 @@ def test_auth_user_cant_delete_account(auth_user, auth_account):
     assert response.status_code == 403
 
 
+def test_auth_user_cant_put(auth_user, auth_account):
+    client.force_login(auth_user)
+    payload = {
+        "balance": 250.00,
+        "date": "1/1/2022",
+        "status": "active"
+    }
+    response = client.put(f"{BASE_URL}/{auth_account.pk}/", payload)
+    assert response.status_code == 403
+
+
 @pytest.mark.django_db
 def test_anon_user_cant_apply_for_loan(apply_payload):
     response = client.post(f"{BASE_URL}/apply/", apply_payload)
