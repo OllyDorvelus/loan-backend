@@ -27,6 +27,13 @@ class Base(Configuration):
 
     ALLOWED_HOSTS = []
 
+    CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+    ]
+
+    CORS_ALLOW_CREDENTIALS = True
+
     DJANGO_APPS = [
         "django.contrib.admin",
         "django.contrib.auth",
@@ -50,6 +57,7 @@ class Base(Configuration):
         "djmoney",
         "dj_rest_auth",
         "django_nextjs",
+        "corsheaders",
     ]
 
     INSTALLED_APPS = DJANGO_APPS + MY_APPS + THIRD_PARTY_APPS
@@ -57,6 +65,7 @@ class Base(Configuration):
     MIDDLEWARE = [
         "django.middleware.security.SecurityMiddleware",
         "django.contrib.sessions.middleware.SessionMiddleware",
+        "corsheaders.middleware.CorsMiddleware",
         "django.middleware.common.CommonMiddleware",
         "django.middleware.csrf.CsrfViewMiddleware",
         "django.contrib.auth.middleware.AuthenticationMiddleware",
